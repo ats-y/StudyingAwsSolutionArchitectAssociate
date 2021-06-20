@@ -12,10 +12,14 @@
     - [ネットワーキングとコンテンツ配信](#ネットワーキングとコンテンツ配信)
         - [CloudFront](#cloudfront)
         - [Route53](#route53)
+        - [Global Accelerator](#global-accelerator)
     - [コンピューティングサービス](#コンピューティングサービス)
         - [EC2](#ec2)
+            - [リザーブドインスタンス](#リザーブドインスタンス)
         - [ELB](#elb)
         - [ECS](#ecs)
+        - [EKS](#eks)
+        - [AWS Fargate](#aws-fargate)
         - [Lambda](#lambda)
     - [運用支援サービス](#運用支援サービス)
         - [CloudWatch](#cloudwatch)
@@ -24,7 +28,12 @@
         - [EBS](#ebs)
         - [EFS](#efs)
         - [S3](#s3)
-        - [S3 Glacier](#s3-glacier)
+            - [標準](#標準)
+            - [Intelligent-Tiering](#intelligent-tiering)
+            - [低頻度アクセス（標準 - AI)](#低頻度アクセス標準---ai)
+            - [1 ゾーン・低頻度アクセス（1ゾーン - AI）](#1-ゾーン・低頻度アクセス1ゾーン---ai)
+            - [Glacier](#glacier)
+            - [Glacier Deep　Archive](#glacier-deep　archive)
         - [Storage Gateway](#storage-gateway)
         - [FSx](#fsx)
     - [データベースサービス](#データベースサービス)
@@ -54,6 +63,16 @@
         - [EMR](#emr)
         - [ELT](#elt)
         - [その他](#その他)
+    - [管理サービス](#管理サービス)
+        - [Trusted Advisor](#trusted-advisor)
+        - [コンシェルジュ](#コンシェルジュ)
+        - [プロフェッショナルサービス](#プロフェッショナルサービス)
+        - [Config](#config)
+        - [System Manager](#system-manager)
+        - [料金](#料金)
+            - [Cost Exproler](#cost-exproler)
+    - [サポート](#サポート)
+        - [エンタープライズサポートプラン](#エンタープライズサポートプラン)
     - [アーキテクチャ設計](#アーキテクチャ設計)
     - [共通用語](#共通用語)
 
@@ -123,19 +142,40 @@ https://aws.amazon.com/jp/aws-jp-introduction/aws-jp-webinar-service-cut/
 
 ### CloudFront
 
+https://d1.awsstatic.com/webinars/jp/pdf/services/20190730_AWS-BlackBelt_Amazon_CloudFront.pdf  
+https://www.youtube.com/watch?v=mmRKzzOvJJY
+
 ### Route53
 
 * 位置情報ルーティングポリシー  
 ユーザの位置情報に基づいてルーティングする。  
 日本からのアクセスは日本語コンテンツが配置されたWebサーバーに接続するという制御が可能。
 
+### Global Accelerator
+
+地理的に近いエンドポイントにTCP/UDPトラフィックを最適にルーティングする。
+
 ## コンピューティングサービス
 
 ### EC2
 
+#### リザーブドインスタンス
+* 利用期間は1年 or 3年。
+* 前払いで割引価格で購入可能。
+* 利用しなくなったらマーケットプレイスで販売可能。
+* コンパーチブルタイプでは属性を変更可能。
+
 ### ELB
 
 ### ECS
+
+### EKS
+
+Elastic Kubernetes Service
+
+### AWS Fargate
+
+ESC,EKS(Elastic Kubernetes Service)で動作するコンテナ向けサーバレスコンピューティングエンジン。
 
 ### Lambda
 
@@ -149,14 +189,34 @@ https://aws.amazon.com/jp/aws-jp-introduction/aws-jp-webinar-service-cut/
 
 ### EBS
 
+* インスタンスストア  
+スループットが早い。揮発性でEC2を終了するとデータが消える。
+
 ### EFS
 
 NFSv4(Network File System)プロトコルによるデータ転送をサポートしている。
 
 ### S3
 
+以下のストレージクラスがある。
+#### 標準
+#### Intelligent-Tiering
+アクセスパターンに応じて自動的にコストを削減する。
+頻繁・低頻度・アーカイブ・ディープアーカイブの4層をもち、アクセスパターンによって、自動的にデータを移動する。
 
-### S3 Glacier
+#### 低頻度アクセス（標準 - AI)
+格納コストが安価で、頻繁にアクセスしないが高速なアクセスが必要な場合に使う。
+
+#### 1ゾーン・低頻度アクセス（1ゾーン - AI）
+1AZにデータを保存。可用性が低くなるが低コスト。
+
+#### Glacier
+低コストで長期保存。
+データ取り出しには事前にリクエストが必要で、取り出し可能になるまで数分〜数時間かかる。
+
+#### Glacier Deep　Archive
+一年に1・2回しかアクセスしないデータの保存用。
+取り出し可能になるまで、最大12h。
 
 ### Storage Gateway
 
@@ -190,6 +250,16 @@ S3、S3Glacier、EBSなどを利用する。
 ## データベースサービス
 
 ### RDS
+
+* マルチAZ配置  
+  目的は、高可用性。
+  自動フェイルオーバーを実現。
+
+* マルチリージョン配置  
+  目的は、災害復旧
+
+* リードレプリカ  
+  目的は、スケーラビリティ。
 
 ### Redshift
 
@@ -257,6 +327,10 @@ Redshiftクラスタ
 
 ### IAM
 
+* Security Token Service(STS)  
+AWSのサービスにアクセスできる一時的な限定権限認証情報を取得できる。
+
+
 ### KMS / CloudHSM
 
 ### AWS Certificate Manager
@@ -283,9 +357,17 @@ Redshiftクラスタ
 
 ### Elastic Beanstalk
 
+アプリケーションを素早くデプロイし管理を自動化できる。  
+Git・IDEからアプリケーションをアップロードするだけで、デプロイの詳細（容量プロビジョニング、負荷分散、AutoScaling、アプリケーションのヘルスモニタリングなど）を処理する。
+
 ### OpsWorks
 
+ChefやPuppetのコードを使ってインフラ構成の自動化、構成管理を行う。
+
 ### CloudFormation
+
+コードに基づいてクラウドインフラを構築することができる。  
+アプリケーション展開は直接は不可。
 
 ## 分析サービス
 
@@ -294,6 +376,44 @@ Redshiftクラスタ
 ### ELT
 
 ### その他
+
+## 管理サービス
+
+### Trusted Advisor
+
+ベストプラクティスに対してどうだったか自動チェックする。
+* コスト最適化
+* パフォーマンス
+* セキュリティー
+* フォールトトレランス（耐障害性）
+* サービス制限
+
+### コンシェルジュ
+
+エンタープライズサポートプラン。
+
+### プロフェッショナルサービス
+
+### Config
+
+リソースの設定を評価、監査、審査できるサービス。
+
+### System Manager
+
+AWSサービスのデータを一元管理し、構成を可視化する。  
+運用タスクを自動化する。
+
+### 料金
+#### Cost Exproler
+コストと使用状況を表示・分析するツール。
+
+
+## サポート
+
+### エンタープライズサポートプラン
+
+* Infractructure Event Management  
+AWSエキスパートがイベント計画に関わり、アーキテクチャやスケーリング、運用に関するガイダンスやアプローチを提供する。
 
 ## アーキテクチャ設計
 
