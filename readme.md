@@ -8,10 +8,12 @@
     - [目次](#目次)
     - [グローバグインフラストラクチャとネットワーク](#グローバグインフラストラクチャとネットワーク)
         - [リージョンとアベイラビリティゾーン（AZ）](#リージョンとアベイラビリティゾーンaz)
-            - [VPC (Amazon Virtual Private Cloud](#vpc-amazon-virtual-private-cloud)
+            - [VPC (Amazon Virtual Private Cloud）](#vpc-amazon-virtual-private-cloud)
     - [ネットワーキングとコンテンツ配信](#ネットワーキングとコンテンツ配信)
         - [CloudFront](#cloudfront)
         - [Route53](#route53)
+            - [Resolver](#resolver)
+            - [Resolver for Hybrid Clouds](#resolver-for-hybrid-clouds)
         - [Global Accelerator](#global-accelerator)
     - [コンピューティングサービス](#コンピューティングサービス)
         - [EC2](#ec2)
@@ -31,12 +33,7 @@
         - [EBS](#ebs)
         - [EFS](#efs)
         - [S3](#s3)
-            - [標準](#標準)
-            - [Intelligent-Tiering](#intelligent-tiering)
-            - [低頻度アクセス（標準 - AI)](#低頻度アクセス標準---ai)
-            - [1 ゾーン・低頻度アクセス（1ゾーン - AI）](#1-ゾーン・低頻度アクセス1ゾーン---ai)
-            - [Glacier](#glacier)
-            - [Glacier Deep　Archive](#glacier-deep　archive)
+            - [ストレージクラス](#ストレージクラス)
         - [Storage Gateway](#storage-gateway)
         - [FSx](#fsx)
     - [データベースサービス](#データベースサービス)
@@ -44,6 +41,8 @@
         - [Redshift](#redshift)
         - [dynamoDB](#dynamodb)
         - [ElastiCahce](#elasticahce)
+            - [Memcashed](#memcashed)
+            - [Redis](#redis)
         - [その他](#その他)
     - [セキュリティとアイデンティティ](#セキュリティとアイデンティティ)
         - [IAM](#iam)
@@ -66,16 +65,22 @@
         - [OpsWorks](#opsworks)
         - [CloudFormation](#cloudformation)
     - [分析サービス](#分析サービス)
-        - [★EMR](#★emr)
+        - [Athena](#athena)
+        - [EMR](#emr)
         - [ELT](#elt)
+        - [Kinesis](#kinesis)
+            - [Data Firehose](#data-firehose)
+            - [Data Stream](#data-stream)
+            - [Data Analytics](#data-analytics)
+            - [Agent](#agent)
         - [その他](#その他)
     - [管理サービス](#管理サービス)
         - [コンシェルジュ](#コンシェルジュ)
         - [プロフェッショナルサービス](#プロフェッショナルサービス)
         - [Config](#config)
-        - [System Manager](#system-manager)
+        - [Systems Manager](#systems-manager)
     - [料金](#料金)
-        - [AWS料金計算ツール](#aws料金計算ツール)
+        - [AWS料金計算ツール（AWS Pricing Calculator）](#aws料金計算ツールaws-pricing-calculator)
         - [請求ダッシュボード](#請求ダッシュボード)
             - [Budgets](#budgets)
             - [Cost Exproler](#cost-exproler)
@@ -102,7 +107,7 @@ https://aws.amazon.com/jp/aws-jp-introduction/aws-jp-webinar-service-cut/
 
 ### リージョンとアベイラビリティゾーン（AZ）
   
-#### VPC (Amazon Virtual Private Cloud
+#### VPC (Amazon Virtual Private Cloud）
 
 * インターネットゲートウェイ(IGW)
 * 仮想プライベートゲートウェイ(PGW)
@@ -136,9 +141,11 @@ https://aws.amazon.com/jp/aws-jp-introduction/aws-jp-webinar-service-cut/
     トラフィックをパブリックインターネットをに公開せずVPC・AWSサービス・オンプレと接続するサービス。
 
 * VPCピアリング
-  2つのVPCをプライベートに接続する機能。
+  2つのVPCをプライベートに接続する機能。  
+  別のリージョン、別のAWSアカウントのVPCとも接続可能。  
+  中国リージョンとは接続できない。
 
-* VPCフローログ
+* VPCフローログ  
   ENI(AWSの仮想NIC。Elastic Network Interface,ENI)単位に記録されるネットワークログ。
 
 * Direct Connect
@@ -164,9 +171,48 @@ https://www.youtube.com/watch?v=mmRKzzOvJJY
 
 ### Route53
 
-* 位置情報ルーティングポリシー  
+名前解決を行うネームサーバをマネージドで提供するサービス。  
+
+* Public Hosted Zone  
+インターネット上に公開されたDNSドメインのレコードを管理するコンテナ。
+
+* Private Hosted Zone  
+VPCに閉じたプライベートネットワーク内のDNSドメインのレコードを管理するコンテナ。
+
+複数のルーティングポリシーがある。
+
+* シンプルルーティング  
+通常のDNSレコードによるルーティング。  
+同じ名前の複数のレコードは設定できないが、一つの名前に複数の値を設定でき、リゾルバはランダムな値を返す。
+
+* 位置情報ルーティング  
 ユーザの位置情報に基づいてルーティングする。  
 日本からのアクセスは日本語コンテンツが配置されたWebサーバーに接続するという制御が可能。
+
+* フェイルオーバー
+
+* 地理的接近性
+
+* レイテンシー
+
+* 複数回答値
+
+* 加重
+
+
+#### Resolver
+
+VPCに標準で備わるDNSサーバー。
+
+#### Resolver for Hybrid Clouds
+
+オンプレとVPC間の名前解決を行う。
+
+* オンプレ → VPC
+* オンプレ → インターネット
+* VPC ｈ→ オンプレ
+* 
+
 
 ### Global Accelerator
 
@@ -187,7 +233,7 @@ https://www.youtube.com/watch?v=mmRKzzOvJJY
 
 * リザーブドインスタンス
   * 利用期間は1年 or 3年。
-  * 前払いで割引価格で購入可能。
+  * スタンダードで前払いで割引価格で購入可能。ただし1ヶ月以上の期間が残っていること。
   * 利用しなくなったらマーケットプレイスで販売可能。
   * コンパーチブルタイプでは属性を変更可能。
 
@@ -245,25 +291,29 @@ NFSv4(Network File System)プロトコルによるデータ転送をサポート
 
 ### S3
 
-以下のストレージクラスがある。
-#### 標準
-#### Intelligent-Tiering
+可用性と耐久性が高いストレージサービス。
+
+#### ストレージクラス
+
+* 標準
+* Intelligent-Tiering  
 アクセスパターンに応じて自動的にコストを削減する。
 頻繁・低頻度・アーカイブ・ディープアーカイブの4層をもち、アクセスパターンによって、自動的にデータを移動する。
 
-#### 低頻度アクセス（標準 - AI)
+* 低頻度アクセス（標準 - AI)  
 格納コストが安価で、頻繁にアクセスしないが高速なアクセスが必要な場合に使う。
 
-#### 1ゾーン・低頻度アクセス（1ゾーン - AI）
+* 1ゾーン・低頻度アクセス（1ゾーン - AI）
 1AZにデータを保存。可用性が低くなるが低コスト。
 
-#### Glacier
+* Glacier
 低コストで長期保存。
 データ取り出しには事前にリクエストが必要で、取り出し可能になるまで数分〜数時間かかる。
 
-#### Glacier Deep　Archive
+* Glacier Deep　Archive
 一年に1・2回しかアクセスしないデータの保存用。
 取り出し可能になるまで、最大12h。
+
 
 ### Storage Gateway
 
@@ -366,7 +416,29 @@ Redshiftクラスタ
 
 ### dynamoDB
 
+* グローバルテーブル  
+グローバルに展開されたアプリケーションに対して高速読み取りを提供するレプリケーションの仕組み。
+
+* DAX  
+インメモリキャッシュ。
+
 ### ElastiCahce
+
+完全マネージド型インメモリデータベース。  
+高速リアルタイム処理、トランザクションが可能。  
+KVS(Key-Valueストア)
+
+#### Memcashed
+
+* シンプルなキャッシュシステム
+* データに永続性はない。
+* スケールイン・スケールアウトが可能
+
+#### Redis
+
+* 多様なデータ型が利用できる
+* 永続性がある
+* フェイルオーバ・バックアップリストが可能
 
 ### その他
 
@@ -466,9 +538,50 @@ ChefやPuppetのコードを使ってインフラ構成の自動化、構成管�
 
 ## 分析サービス
 
-### ★EMR
+### Athena
+
+S3にあるデータを標準SQLをつかって簡単に分析できるクエリサービス。
+
+クエリ単位に課金。S3データスキャン1TBに対し5USD。  
+DDL、失敗クエリには課金されない。
+
+
+### EMR
+
+分散処理フレームワークによるビックデータのクラウドプラットフォーム。
+
+ユースケース  
+* 機械学習
+* ETL(Exact抽出、Transform加工、Load読み出し)
+* クイックストリーム分析
+* リアルタイムストリーミング分析
+* ゲノミクス
+
+分散フレームワーク  
+* マスターノード：ノード間でのデータおよびタスク分散を調整する。
+* コアノード：タスクを実行し、Hadoop Distributed File System（HDFS）にデータを保存。
+* タスクノード：タスクのみ実行。データは持たない。
 
 ### ELT
+
+### Kinesis
+
+#### Data Firehose
+
+蓄積前にデータを加工する。
+
+#### Data Stream
+
+ストリーム処理向けのアプリケーションを構築できる。
+
+#### Data Analytics
+
+ストリームデータのリアウタイム解析を行う。
+
+#### Agent
+
+ストリーミングデータを収集して取り込む仕組みをアプリケーションに実装できる。
+
 
 ### その他
 
@@ -485,15 +598,22 @@ ChefやPuppetのコードを使ってインフラ構成の自動化、構成管�
 リソースの設定を評価、監査、審査できるサービス。
 リソースのプロビジョンニング・設定のルールを定義でき、逸脱がないかチェックできる。
 
-### System Manager
+### Systems Manager
 
 AWSサービスのデータを一元管理し、構成を可視化する。  
 運用タスクを自動化する。
 
+* リソースグループごとに運用データを確認できる。
+* 各リソースグループをタグごとに管理・仕分けることができる。
+* EC2のパッチ、更新、設定変更、削除、停止、デプロイを自動化できる。
+
 ## 料金
 
-### AWS料金計算ツール
+### AWS料金計算ツール（AWS Pricing Calculator）
 ユースケースのコスト見積もりを作成できる。
+
+簡易コスト計算ツールは廃止された。
+
 
 ### 請求ダッシュボード
 
