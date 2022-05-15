@@ -48,7 +48,6 @@ https://docs.aws.amazon.com/ja_jp/
         - [ECS](#ecs)
         - [EKS](#eks)
         - [AWS Fargate](#aws-fargate)
-        - [ELB](#elb)
         - [Lambda](#lambda)
     - [データベースサービス](#データベースサービス)
         - [RDS](#rds)
@@ -110,6 +109,11 @@ https://docs.aws.amazon.com/ja_jp/
             - [VPCフローログ](#vpcフローログ)
             - [NLB](#nlb)
             - [Site-to-Site VPN(サイト間VPN)](#site-to-site-vpnサイト間vpn)
+        - [ELB](#elb)
+            - [Clasic Load Balancer](#clasic-load-balancer)
+            - [Application Load Balancer](#application-load-balancer)
+            - [Network Load Balancer](#network-load-balancer)
+            - [Gateway Load Balancer](#gateway-load-balancer)
     - [セキュリティ、アイデンティティ、コンプライアンス](#セキュリティアイデンティティコンプライアンス)
         - [AWS Certificate Manager](#aws-certificate-manager)
         - [AWS Directory Service](#aws-directory-service)
@@ -253,7 +257,7 @@ DDL、失敗クエリには課金されない。
 
 #### Data Analytics
 
-ストリームデータのリアウタイム解析を行う。
+ストリームデータのリアルタイム解析を行う。
 
 #### Agent
 
@@ -351,8 +355,6 @@ Elastic Kubernetes Service
 
 ESC,EKS(Elastic Kubernetes Service)で動作するコンテナ向けサーバレスコンピューティングエンジン。
 
-### ELB
-
 ### Lambda
 
 * 課金要素は利用時間とリクエスト数。
@@ -448,8 +450,17 @@ Redshiftクラスタ
 マルチリージョンにマルチマスターデータベースをデプロイする。  
 グローバルなユーザに低レイテンシーアクセスを提供する。
 
-* DAX  
+* dynamoDB Accelerator(DAX)  
 インメモリキャッシュ。
+
+* dynamoDB ストリーム
+
+テーブル変更などをトリガーにLambdaなどを起動する。
+
+* dynamoDb Auto Scaling
+
+テーブルとインデックスを監視して、アプリケーションのトラフィックにあわせてスロットリングなしで自動的にスループットを調整する。  
+これにより一時的な負荷に対してパフォーマンス管理が容易となり、アプリケーション可用性を維持しつつコストを抑えることができる。
 
 #### 読み込み整合性
 
@@ -463,7 +474,7 @@ GSIでは利用不可。
 #### 料金
 
 * 同じリージョンのAZ間のデータ転送は無料。
-* リージョン間のデータ転送は、送受信リージョン双方に課金される。
+* リージョン間のデータ転送は、送受信リージョン双方に課金される。
 
 ### Aurora
 
@@ -731,6 +742,26 @@ IPSecがサポートされている。
 
 VPCはデフォルトではインターネットと通信できないが、サイト間VPNを利用すると通信できる。
 
+### ELB
+
+受信したトラフィックを複数のAZの複数ターゲット（EC2、コンテナ、IPアドレスなど）に振り分ける。
+
+#### Clasic Load Balancer
+
+L4/L7対応ロードバランサー。
+古いタイプのロードバランサーでALB、NLBが優先。
+
+#### Application Load Balancer
+
+L7対応ロードバランサー。
+
+#### Network Load Balancer
+
+L4 NAT　ロードバランサー。  
+毎秒数百万回のリクエストを処理できる高性能ロードバランサー。大規模システム向け。
+
+
+#### Gateway Load Balancer
 
 
 ## セキュリティ、アイデンティティ、コンプライアンス
