@@ -25,8 +25,8 @@ https://docs.aws.amazon.com/ja_jp/
         - [EMR](#emr)
         - [Glue](#glue)
         - [Kinesis](#kinesis)
-            - [Data Firehose](#data-firehose)
             - [Data Stream](#data-stream)
+            - [Data Firehose](#data-firehose)
             - [Data Analytics](#data-analytics)
             - [Agent](#agent)
         - [Quick Sight](#quick-sight)
@@ -247,13 +247,66 @@ DDL、失敗クエリには課金されない。
 
 ### Kinesis
 
-#### Data Firehose
-
-蓄積前にデータを加工する。
-
 #### Data Stream
 
-ストリーム処理向けのアプリケーションを構築できる。
+あらゆる規模のデータストリームをキャプチャ・処理・保存することを可能とする。
+
+IoTなど、次々に送られてくるデータを別のサービスに届けるサービス。
+
+* プロデューサー  
+  Data Streamへの入力元。
+
+* コンシューマー  
+  Data Streamからの出力先。  
+  S3、DynamoDB、Redshift、EMR、Kinesis FirehoseFirehose。
+
+* データストリーム  
+  シャードのかたまり。各シャードには一連のデータレコードがある。
+  
+* データレコード  
+  保存されるデータの単位。シーケンス番号、パーティションキー、blobデータで構成される。blobデータは1MB。
+
+* キャパシティモード  
+  容量の管理方法と課金方法。  
+  オンデマンドモードとプロビジョニングモードがある。
+
+  * オンデマンドモード  
+    必要なスループットを提供するためにシャードを自動的に管理する。使用する実際のスループットに対して課金される。
+
+  * プロビジョニングモード  
+    シャード数を指定する。
+    シャード合計容量のスループットに対し1時間ごとに課金される。
+
+* シャード  
+  ストリーム内の一意に識別されたデータレコードのシーケンス。
+
+* パーティションキー  
+  シャードごとにデータをグループ化するために使用される。データレコードのパーティションキーからそのデータレコードが属するシャードを特定する。
+
+* シーケンス番号  
+  シャード内のパーティションキーごとの一意の番号。
+
+* サーバ側暗号化  
+  プロデューサーから入力したデータを自動的に暗号化できる。  
+  暗号化はAWS KMSのマスターキーを使用する。
+  
+#### Data Firehose
+
+ストリーミングを確実にキャプチャ、変換し、データレイク・データストア・分析サービスに配信するELTサービス。  
+配信されたストリーミングは、Athena・Redshift・その他分析ツールで解析する。
+
+概念図：  
+https://aws.amazon.com/jp/kinesis/data-firehose/
+
+
+* データ採取  
+  AWS SDK、Amazon Kinesis Data Stream、Amazon Kinesis AgentなどのAWSサービス。または、オープンソースエージェント。
+
+* 変換  
+  AWS Lambdaで変換できる。
+
+* 配信  
+  S3、Redshift、OpenSerch、Splunk（データ分析サービス）、HTTPエンドポイント。
 
 #### Data Analytics
 
