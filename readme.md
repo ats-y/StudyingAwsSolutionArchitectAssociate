@@ -72,6 +72,7 @@ https://docs.aws.amazon.com/ja_jp/
         - [Config](#config)
         - [EventBridge（CloudWatch Events)](#eventbridgecloudwatch-events)
         - [AWS Organizations](#aws-organizations)
+            - [SCP サービスコントロールポリシー](#scp-サービスコントロールポリシー)
         - [AWS Resource Access Manager](#aws-resource-access-manager)
         - [AWS Systems Manager](#aws-systems-manager)
         - [Trusted Advisor](#trusted-advisor)
@@ -133,6 +134,9 @@ https://docs.aws.amazon.com/ja_jp/
         - [AWS WAF](#aws-waf)
     - [ストレージ](#ストレージ)
         - [EBS](#ebs)
+            - [種類](#種類)
+            - [インスタンスストア](#インスタンスストア)
+            - [スナップショット](#スナップショット)
         - [EFS](#efs)
         - [FSx](#fsx)
         - [S3](#s3)
@@ -546,6 +550,12 @@ GSIでは利用不可。
 高速リアルタイム処理、トランザクションが可能。  
 KVS(Key-Valueストア)
 
+* ユースケース
+  * インメモリデータストア  
+    データのコピーに超高速で低コストなアクセス。
+  * ゲームのリーダーボード
+  * レコメンテーション
+
 #### Memcashed
 
 * シンプルなキャッシュシステム
@@ -561,7 +571,6 @@ KVS(Key-Valueストア)
 * pub/sub機能を提供。
 * 全ての操作は排他的。
 * シングルスレッドで動作。
-
 
 ## マネジメント、ガバナンス
 
@@ -599,6 +608,10 @@ ChefやPuppetのコードを使ってインフラ構成の自動化、構成管�
 * 複数アカウントの一括請求
 * ポリシーの集中管理
 * 利用できるサービスの制限
+
+#### SCP サービスコントロールポリシー
+
+AWSアカウントまたはOU（組織単位）に対してAWSサービスへの権限境界を設定できる。  
 
 ### AWS Resource Access Manager
 
@@ -927,10 +940,21 @@ Googleアカウントなどからのソーシャルサインインや、Active D
 
 ### EBS
 
-* インスタンスストア  
+#### 種類
+
+* SSD
+  * 汎用SSD
+  * プロビジョンドIOPS
+* HDD
+  * スループット最適化HDD
+  * コールドHDD
+  
+* マグネティック（旧世代）
+
+#### インスタンスストア  
 スループットが早い。揮発性でEC2を終了するとデータが消える。
 
-* スナップショット
+#### スナップショット
   * S3にバックアップを保存する。
   * 自動的に暗号化される。
   * 増分バックアップ。  
