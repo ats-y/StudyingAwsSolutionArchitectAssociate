@@ -19,7 +19,7 @@ https://docs.aws.amazon.com/ja_jp/
     - [グローバルインフラストラクチャ](#グローバルインフラストラクチャ)
         - [リージョン](#リージョン)
         - [アベイラビリティーゾーン（AZ）](#アベイラビリティーゾーンaz)
-    - [アナリティクス](#アナリティクス)
+    - [分析・アナリティクス](#分析・アナリティクス)
         - [Athena](#athena)
         - [Elasticsearch Service(AWS ES)](#elasticsearch-serviceaws-es)
         - [EMR](#emr)
@@ -30,6 +30,7 @@ https://docs.aws.amazon.com/ja_jp/
             - [Data Analytics](#data-analytics)
             - [Agent](#agent)
         - [Quick Sight](#quick-sight)
+        - [Data PipeLine](#data-pipeline)
     - [AWS の請求情報とコスト管理](#aws-の請求情報とコスト管理)
         - [AWS料金計算ツール（AWS Pricing Calculator）](#aws料金計算ツールaws-pricing-calculator)
         - [請求ダッシュボード](#請求ダッシュボード)
@@ -38,6 +39,7 @@ https://docs.aws.amazon.com/ja_jp/
     - [アプリケーション統合](#アプリケーション統合)
         - [SNS(Simple Notification Service)](#snssimple-notification-service)
         - [SQS](#sqs)
+            - [可視性タイムアウト](#可視性タイムアウト)
     - [コンピューティング](#コンピューティング)
         - [EC2](#ec2)
             - [インスタンス購入オプション](#インスタンス購入オプション)
@@ -104,6 +106,7 @@ https://docs.aws.amazon.com/ja_jp/
             - [プライベートサブネット](#プライベートサブネット)
             - [NATインスタンス](#natインスタンス)
             - [NATゲートウェイ](#natゲートウェイ)
+            - [DNS属性](#dns属性)
             - [セキュリティグループ(SG)](#セキュリティグループsg)
             - [ネットワークACL(Access Control List)](#ネットワークaclaccess-control-list)
             - [VPCエンドポイント](#vpcエンドポイント)
@@ -221,7 +224,7 @@ https://aws.amazon.com/jp/compliance/shared-responsibility-model/
 
 
 
-## アナリティクス
+## 分析・アナリティクス
 
 ### Athena
 
@@ -325,6 +328,11 @@ https://aws.amazon.com/jp/kinesis/data-firehose/
 
 ### Quick Sight
 
+### Data PipeLine
+
+AWSデータベースやストレージ間のデータ移動や変換を自動化するサービス。  
+定期的な動作が可能。
+
 ## AWS の請求情報とコスト管理
 
 ### AWS料金計算ツール（AWS Pricing Calculator）
@@ -363,6 +371,11 @@ https://aws.amazon.com/jp/kinesis/data-firehose/
 
 * デットレターキュー  
 正常処理できないキューを別のキューへ移動させる。  
+
+#### 可視性タイムアウト
+
+特定のキューが複数のコンシューマーに処理されないようにする。  
+キューがコンシューマーに処理されると、そのキューが他のコンシューマーから見えなくなる。
 
 
 ## コンピューティング
@@ -787,6 +800,10 @@ VPCに標準で備わるDNSサーバー。
 グローバルIPを持つ。プライベートIPをNATゲートウェイが持つグローバルIPに変換して外部と通信する。  
 パブリックサブネットに配置する。
 
+#### DNS属性
+
+パブリックIPアドレスを持つインスタンスへのパブリックDNSホスト名の割り当てを行うかどうか設定する。
+
 #### セキュリティグループ(SG)  
 ファイアウォール相当。  
 ステートフルなので、レスポンスを考慮しなくてもよい。  
@@ -795,6 +812,7 @@ ACLとは違い、全てのルールが適用される。
 許可ルールのみ設定する。
 
 設定反映は即時。
+
 
 #### ネットワークACL(Access Control List)  
 タイプ・プロトコル・ポート・IP・送受信でアクセスを制御（許可/拒否）を設定する。
@@ -942,14 +960,13 @@ Googleアカウントなどからのソーシャルサインインや、Active D
 
 #### 種類
 
-* SSD
-  * 汎用SSD
-  * プロビジョンドIOPS
-* HDD
-  * スループット最適化HDD
-  * コールドHDD
-  
-* マグネティック（旧世代）
+|項目|コールドHDD|スループット最適化HDD|汎用SSD|プロビジョンドIOPS|
+|---|---|---|---|---|
+|サイズ|125GiB-16TiB|125GiB-16TiB|1GiB-16TiB|4GiB-16TiB|
+|最大IOPS|250|500|16,000|64,000|256,000|
+|スループット(MiB/s)|250|500|250-1,000|1,000-4,000|
+
+上記の他に、「マグネティック（旧世代）」がある。
 
 #### インスタンスストア  
 スループットが早い。揮発性でEC2を終了するとデータが消える。
