@@ -14,6 +14,8 @@ https://docs.aws.amazon.com/ja_jp/
         - [セキュリティ（Security）](#セキュリティsecurity)
             - [責任共有モデル](#責任共有モデル)
         - [信頼性（Reliability）](#信頼性reliability)
+            - [用語](#用語)
+            - [DR戦略](#dr戦略)
         - [パフォーマンス効率（Performance Efficiency）](#パフォーマンス効率performance-efficiency)
         - [コスト最適化（Cost Optimization）](#コスト最適化cost-optimization)
     - [グローバルインフラストラクチャ](#グローバルインフラストラクチャ)
@@ -88,6 +90,8 @@ https://docs.aws.amazon.com/ja_jp/
     - [ネットワーク、コンテンツ配信](#ネットワークコンテンツ配信)
         - [Amazon API Gateway](#amazon-api-gateway)
         - [CloudFront](#cloudfront)
+            - [キャッシュする期間](#キャッシュする期間)
+            - [コンテンツへのアクセス制限](#コンテンツへのアクセス制限)
         - [AWS Direct Connect](#aws-direct-connect)
         - [Global Accelerator](#global-accelerator)
         - [Route53](#route53)
@@ -207,6 +211,43 @@ https://aws.amazon.com/jp/compliance/shared-responsibility-model/
 
 
 ### 信頼性（Reliability）
+
+#### 用語
+
+* DR - Disaster RecoveryDisaster
+
+  災害対策。
+  
+* 目標復旧時間(RTO - Recovery Time Objective)
+* 目標復旧地点(RPO - Recovery Point Objective)
+
+#### DR戦略
+
+* バックアップと復元
+
+  データをアプリケーションをDRリージョンにバックアップし、復元する。
+
+  RPOは時間単位。RTOは24時間以内。
+
+* パイロットライト
+
+  DRリージョンに停止した状態のサーバを用意しておき、災害発生時に切り替える。
+
+  RPOは分、RTOは時間。
+
+* ウォームスタンバイ
+
+  DRリージョンでスケールダウンされた完全に機能するワークロードを常にONの状態で維持する。
+  
+  RPOは秒、RTOは分。
+
+* マルチリージョン アクティブ-アクティブ
+
+  ワークロードが複数のリージョンにデプロイされ、動作させる。  
+  データを同期させる必要がある。  
+  データの破壊や破損からユーザを守ることはできない。
+
+  RPOは0に近く、RTOも0になる可能性がある。
 
 ### パフォーマンス効率（Performance Efficiency）
 
@@ -519,6 +560,12 @@ Redshiftクラスタ
   クラスタごとに8時間ごと、5Gデータ増加時に自動的に作成される。  
   S3に保存されるのでコストがかかる。
 
+* 拡張VPCルーティング
+
+  クラスターとデータリポジトリ間の全てのCOPY・UNLOADトラフィックをVPC経由に強制できる。 
+  これと、VPCフローログを利用することで、Redshiftのトラフィックを監視できる。
+  
+
 ### dynamoDB
 
 * グローバルテーブル  
@@ -685,6 +732,34 @@ https://www.youtube.com/watch?v=mmRKzzOvJJY
 * トラフィック分散
 
 独自ドメインを設定可能。
+
+#### キャッシュする期間
+
+* TTL
+
+  CloudFront配信時に設定されるキャッシュ保持時間。
+  
+* オリジンが Cache-control: max-age ディレクティブをオブジェクトに設定する。
+
+  オリジンから取得したオブジェクトに、そのオブジェクトのキャッシュ期間を指定する。
+
+
+#### コンテンツへのアクセス制限
+
+特定のユーザに対してのみコンテンツへのアクセスを許可する機能。
+
+* 署名付きURL
+
+  ユーザがアクセス許可を要求した際、アプリケーションがユーザのアクセス権を確認して、署名付きURLを返却する。  
+  コンテンツのURLは署名付きURLに変更される。
+
+* 署名付きCookie
+
+  ユーザがアプリケーションにアクセスした際、署名付きCoockieを発行する。 
+  制限コンテンツアクセスの際、リクエストヘッダの署名付きCoockiesによってアクセスを制限する。  
+  コンテンツのURLは変わらない。
+
+
 
 ### AWS Direct Connect
 
@@ -1041,15 +1116,20 @@ NFSv4(Network File System)プロトコルによるデータ転送をサポート
   S3に保管するときに暗号化し、取得時に自動的に復号化する。  
 
   * SSE-S3  
-    S3で管理されたキー（SSE-S3）を使用する。
+    S3で管理されたキー（SSE-S3）を使用する。  
+    暗号化はAES-256を利用。
 
   * SSE-KMS  
     KWS-KMSで管理されたキーを使用する。
 
+  * SSE-C  
+    ユーザが指定したキーで暗号化する。
+
 * クライアント側暗号化
 
   クライアント側で暗号化しS3に格納する。  
-  暗号化キー・暗号プロセスはクライアント側が管理する。
+  S3側に設定があるわけではない。  
+  暗号化キー・暗号プロセスはクライアント側が管理する。  
 
 #### レプリケーション
 
