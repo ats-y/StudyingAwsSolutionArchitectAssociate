@@ -493,6 +493,18 @@ ESC,EKS(Elastic Kubernetes Service)で動作するコンテナ向けサーバレ
   目的は、スケーラビリティ。  
   RDSは5台まで。
 
+* IAMデータベース認証
+
+  対象RDS
+
+  * MariaDB
+  * MySQL
+  * PostgreSQL
+
+  利用
+
+    AWS CLI、AWS SDKから利用可能。
+
 #### ストレージ
 
 * 汎用SSD
@@ -774,6 +786,13 @@ https://www.youtube.com/watch?v=mmRKzzOvJJY
 
 地理的に近いエンドポイントにTCP/UDPトラフィックを最適にルーティングする。
 
+* BYOIP(Bring Your Own IP)
+
+  自身が保有するIPアドレスをAWSのサービスに割り当てることができる。
+
+  RIR(Region Internet Registry。地域のIPアドレスの割り当てを行うレジストリ(登記所))から、ROA(Remote Origin Authorization)オブジェクトを作成する。
+  ROAを使って、IPアドレスをAWSサービスに紐づける。
+
 ### Route53
 
 名前解決を行うネームサーバをマネージドで提供するサービス。  
@@ -1037,11 +1056,11 @@ Googleアカウントなどからのソーシャルサインインや、Active D
 
 #### 種類
 
-|項目|コールドHDD|スループット最適化HDD|汎用SSD|プロビジョンドIOPS|
-|---|---|---|---|---|
-|サイズ|125GiB-16TiB|125GiB-16TiB|1GiB-16TiB|4GiB-16TiB|
+|項目|コールドHDD|スループット最適化HDD|汎用SSD|プロビジョンドIOPS|プロビジョンドIOPS io2 Block Express|
+|---|---|---|---|---|---|
+|サイズ|125GiB-16TiB|125GiB-16TiB|1GiB-16TiB|4GiB-16TiB|4GiB-16TiB|
 |最大IOPS|250|500|16,000|64,000|256,000|
-|スループット(MiB/s)|250|500|250-1,000|1,000-4,000|
+|スループット(MiB/s)|250|500|250-1,000|1,000|4,000
 
 上記の他に、「マグネティック（旧世代）」がある。
 
@@ -1137,6 +1156,8 @@ NFSv4(Network File System)プロトコルによるデータ転送をサポート
 
 * 同一リージョン、異なるリージョンにレプリケーション可能。
 * 異なるストレージクラスへのレプリケーションが可能。
+* レプリケーションを設定してしまえば、オブジェクトの作成・更新・削除の際に自動的に行われる。
+* レプリケーション時のデータ転送には費用が発生する。
 
 ### Storage Gateway
 
